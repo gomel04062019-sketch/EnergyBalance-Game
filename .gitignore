@@ -1,0 +1,25 @@
+# Windows
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Mac
+.DS_Store
+
+# GameMaker Studio 2 / 2026
+*.resource_order
+*.old
+tmp/
+temp/
+output/
+build/
+Build/
+datafiles_yy/
+*.yyz
+*.win
+*.exe
+*.dll
+*.zip
+.gamemaker/
