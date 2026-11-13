@@ -1,25 +1,31 @@
 // === ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ===
-global.money = 300;             // Стартовый капитал (поставил 300 для теста квестов)
-global.eco_score = 100;         // Чистота воздуха
-global.is_night = false;        // Время суток
-global.weather = "sunny";       // Погода
-global.day_timer = 0;           // Таймер погоды
-build_mode = "house";           // Что строим по умолчанию
+global.money = 300;             
+global.eco_score = 100;         
+global.is_night = false;        
+global.weather = "sunny";       
+global.day_timer = 0;           
+build_mode = "house";           
 
-// Состояние игры
-global.game_state = "playing";  // "playing", "win", "lose"
+global.game_state = "playing";  
 
 // === СИСТЕМА КВЕСТОВ ===
 global.quest_stage = 1; 
 global.quest_text = "Задание 1: Постройте 3 дома";
+prev_quest_stage = global.quest_stage; 
+global.quest_timer = 15 * 60; 
+global.quest_journal_open = false;
 
 // === УЛУЧШЕНИЯ (ТЕХ ДЕРЕВО) ===
 global.tech_menu_open = false;
-global.active_tab = "houses";   // "houses" или "stations"
-global.upg_insulation = false;  // Утепление домов
-global.upg_filter = false;      // Фильтры для ТЭЦ
+global.active_tab = "houses";   
+global.upg_insulation = false;  
+global.upg_filter = false;      
 
-// === СИСТЕМА ОБРАЗОВАТЕЛЬНЫХ СОВЕТОВ ===
+// === МЕНЮ СТРОИТЕЛЬСТВА ===
+global.build_menu_open = false;
+global.build_category = "house"; 
+
+// === СИСТЕМА СОВЕТОВ ===
 global.tips = [
     "Знаете ли вы? Замена ламп накаливания на LED экономит до 80% электроэнергии.",
     "Совет: Выключайте компьютер, когда уходите. Он тратит энергию даже в спящем режиме.",
@@ -34,7 +40,7 @@ global.tip_timer = 0;
 global.tip_display_timer = 0;    
 global.is_paused = false; 
 
-// Включаем резкие пиксели (убирает размытые швы)
+// Включаем резкие пиксели
 gpu_set_tex_filter(false); 
 
 // === ГЕНЕРАЦИЯ КАРТЫ ===

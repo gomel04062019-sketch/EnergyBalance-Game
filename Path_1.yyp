@@ -38,6 +38,7 @@
     {"id":{"name":"obj_wind","path":"objects/obj_wind/obj_wind.yy",},},
     {"id":{"name":"rm_menu","path":"rooms/rm_menu/rm_menu.yy",},},
     {"id":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},
+    {"id":{"name":"Enter","path":"sprites/Enter/Enter.yy",},},
     {"id":{"name":"spr_grass_tiles","path":"sprites/spr_grass_tiles/spr_grass_tiles.yy",},},
     {"id":{"name":"spr_house_1","path":"sprites/spr_house_1/spr_house_1.yy",},},
     {"id":{"name":"spr_house_2","path":"sprites/spr_house_2/spr_house_2.yy",},},
