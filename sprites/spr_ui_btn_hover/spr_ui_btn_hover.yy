@@ -2,9 +2,9 @@
   "$GMSprite":"v2",
   "%Name":"spr_ui_btn_hover",
   "bboxMode":0,
-  "bbox_bottom":17,
+  "bbox_bottom":20,
   "bbox_left":0,
-  "bbox_right":25,
+  "bbox_right":29,
   "bbox_top":0,
   "collisionKind":1,
   "collisionTolerance":0,
@@ -16,7 +16,7 @@
   ],
   "gridX":0,
   "gridY":0,
-  "height":18,
+  "height":21,
   "HTile":false,
   "layers":[
     {"$GMImageLayer":"","%Name":"29f08baa-a088-4549-a664-382501e5da81","blendMode":0,"displayName":"default","isLocked":false,"name":"29f08baa-a088-4549-a664-382501e5da81","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
@@ -86,5 +86,5 @@
   },
   "type":0,
   "VTile":false,
-  "width":26,
+  "width":30,
 }

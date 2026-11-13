@@ -15,7 +15,7 @@ prev_quest_stage = global.quest_stage;
 global.quest_timer = 15 * 60; 
 global.quest_journal_open = false;
 
-// === УЛУЧШЕНИЯ (ТЕХ ДЕРЕВО) ===
+// === УЛУЧШЕНИЯ ===
 global.tech_menu_open = false;
 global.active_tab = "houses";   
 global.upg_insulation = false;  
@@ -25,7 +25,7 @@ global.upg_filter = false;
 global.build_menu_open = false;
 global.build_category = "house"; 
 
-// === СИСТЕМА СОВЕТОВ ===
+// === СОВЕТЫ ===
 global.tips = [
     "Знаете ли вы? Замена ламп накаливания на LED экономит до 80% электроэнергии.",
     "Совет: Выключайте компьютер, когда уходите. Он тратит энергию даже в спящем режиме.",
@@ -40,7 +40,6 @@ global.tip_timer = 0;
 global.tip_display_timer = 0;    
 global.is_paused = false; 
 
-// Включаем резкие пиксели
 gpu_set_tex_filter(false); 
 
 // === ГЕНЕРАЦИЯ КАРТЫ ===
@@ -58,21 +57,18 @@ global.grass_y2 = room_height - 256;
 
 var sand_padding = 64; 
 
-// 1. Вода
 for (var j = 0; j < room_height; j += tile_h) {
     for (var i = 0; i < room_width; i += tile_w) {
         var w = instance_create_depth(i, j, 1001, obj_water);
         if ((j div tile_h) mod 2 == 1) w.x += tile_w / 2;
     }
 }
-// 2. Песок
 for (var j = global.grass_y1 - sand_padding; j < global.grass_y2 + sand_padding; j += tile_h) {
     for (var i = global.grass_x1 - sand_padding; i < global.grass_x2 + sand_padding; i += tile_w) {
         var s = instance_create_depth(i, j, 1000, obj_sand);
         if ((j div tile_h) mod 2 == 1) s.x += tile_w / 2;
     }
 }
-// 3. Трава
 for (var j = global.grass_y1; j < global.grass_y2; j += tile_h) {
     for (var i = global.grass_x1; i < global.grass_x2; i += tile_w) {
         var g = instance_create_depth(i, j, 999, obj_grass);

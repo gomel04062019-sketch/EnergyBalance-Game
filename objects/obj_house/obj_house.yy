@@ -12,8 +12,8 @@
     "path":"folders/obj.yy",
   },
   "parentObjectId":{
-    "name":"obj_building",
-    "path":"objects/obj_building/obj_building.yy",
+    "name":"obj_residential",
+    "path":"objects/obj_residential/obj_residential.yy",
   },
   "persistent":false,
   "physicsAngularDamping":0.1,
@@ -33,8 +33,8 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"spr_house_1",
-    "path":"sprites/spr_house_1/spr_house_1.yy",
+    "name":"spr_good_house_1",
+    "path":"sprites/spr_good_house_1/spr_good_house_1.yy",
   },
   "spriteMaskId":null,
   "visible":true,

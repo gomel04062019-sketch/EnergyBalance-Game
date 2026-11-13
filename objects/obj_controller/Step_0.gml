@@ -1,4 +1,5 @@
-// === 1. ПАУЗА И МЕНЮ ===
+// === 1. ПАУЗА И F11 ===
+if (keyboard_check_pressed(vk_f11)) window_set_fullscreen(!window_get_fullscreen());
 if (keyboard_check_pressed(vk_escape)) global.is_paused = !global.is_paused;
 if (global.is_paused) exit;
 if (global.game_state != "playing") exit;
@@ -7,27 +8,14 @@ if (keyboard_check_pressed(ord("T"))) global.tech_menu_open = !global.tech_menu_
 if (global.tech_menu_open || global.quest_journal_open) exit;
 
 // === 2. ЛОГИКА КВЕСТОВ ===
+var total_houses = instance_number(obj_house) + instance_number(obj_medium_house) + instance_number(obj_lux_house);
+
 switch (global.quest_stage) {
-    case 1:
-        global.quest_text = "Задание 1: Постройте 3 дома";
-        if (instance_number(obj_house) >= 3) global.quest_stage = 2;
-        break;
-    case 2:
-        global.quest_text = "Задание 2: Выработайте 50 МВт энергии";
-        if (global.total_energy >= 50) global.quest_stage = 3;
-        break;
-    case 3:
-        global.quest_text = "Задание 3: Накопите 500$";
-        if (global.money >= 500) global.quest_stage = 4;
-        break;
-    case 4:
-        global.quest_text = "Задание 4: Откройте Технологии (T) и купите Утепление домов";
-        if (global.upg_insulation) global.quest_stage = 5;
-        break;
-    case 5:
-        global.quest_text = "Задание 5: Достигните экологии 80% и накопите 1000$";
-        if (global.eco_score >= 80 && global.money >= 1000) global.game_state = "win";
-        break;
+    case 1: global.quest_text = "Задание 1: Постройте 3 дома"; if (total_houses >= 3) global.quest_stage = 2; break;
+    case 2: global.quest_text = "Задание 2: Выработайте 50 МВт энергии"; if (global.total_energy >= 50) global.quest_stage = 3; break;
+    case 3: global.quest_text = "Задание 3: Накопите 500$"; if (global.money >= 500) global.quest_stage = 4; break;
+    case 4: global.quest_text = "Задание 4: Откройте Технологии (T) и купите Утепление домов"; if (global.upg_insulation) global.quest_stage = 5; break;
+    case 5: global.quest_text = "Задание 5: Достигните экологии 80% и накопите 1000$"; if (global.eco_score >= 80 && global.money >= 1000) global.game_state = "win"; break;
 }
 
 if (global.quest_stage != prev_quest_stage) {
@@ -36,53 +24,72 @@ if (global.quest_stage != prev_quest_stage) {
 }
 if (global.quest_timer > 0) global.quest_timer -= 1;
 
-// === 4. ВЫБОР ЗДАНИЯ И СТРОИТЕЛЬСТВО ===
+// === 3. УПРАВЛЕНИЕ СТРОИТЕЛЬСТВОМ ===
 var mx = device_mouse_x_to_gui(0); 
 var my = device_mouse_y_to_gui(0);
-var ui_y = display_get_gui_height() - 95; 
+var gui_w = display_get_gui_width();
+var ui_y = display_get_gui_height() - 150; // ИСПРАВЛЕНО: панель теперь высотой 150
 
+var btn_w = 160;
+var gap = 15;
+var total_w = (3 * btn_w) + (2 * gap);
+var start_x = (gui_w - total_w) / 2;
+
+// СНОС ЗДАНИЯ (ПКМ)
+if (mouse_check_button_pressed(mb_right)) {
+    if (instance_exists(obj_ghost)) {
+        instance_destroy(obj_ghost); 
+    } else if (!global.build_menu_open) {
+        if (my <= ui_y) { 
+            var building_to_delete = instance_position(mouse_x, mouse_y, obj_building);
+            if (building_to_delete != noone) {
+                global.money += floor(building_to_delete.cost / 2);
+                instance_destroy(building_to_delete);
+            }
+        }
+    }
+}
+
+// ЛЕВЫЙ КЛИК (ПОСТРОЙКА)
 if (mouse_check_button_pressed(mb_left)) {
-    // 1. КЛИК ПО НИЖНИМ КНОПКАМ
     if (my > ui_y) {
-        if (mx > 20 && mx < 170)  { global.build_menu_open = !global.build_menu_open; global.build_category = "house"; }
-        else if (mx > 190 && mx < 340) { global.build_menu_open = !global.build_menu_open; global.build_category = "stations"; }
-        else if (mx > 360 && mx < 510) { global.build_menu_open = !global.build_menu_open; global.build_category = "decor"; }
+        if (mx > start_x && mx < start_x + btn_w) { global.build_menu_open = !global.build_menu_open; global.build_category = "house"; }
+        else if (mx > start_x + btn_w + gap && mx < start_x + btn_w*2 + gap) { global.build_menu_open = !global.build_menu_open; global.build_category = "stations"; }
+        else if (mx > start_x + (btn_w + gap)*2 && mx < start_x + btn_w*3 + gap*2) { global.build_menu_open = !global.build_menu_open; global.build_category = "decor"; }
         
         if (instance_exists(obj_ghost)) instance_destroy(obj_ghost);
         exit; 
     }
 
-        // 2. КЛИК ПО ОТКРЫТОМУ МЕНЮ (по клеточкам)
     if (global.build_menu_open) {
-        var menu_x = display_get_gui_width()/2 - 350;
-        var menu_y = ui_y - 260; // Подняли выше
+        var menu_x = gui_w/2 - 350;
+        var menu_y = ui_y - 270; // Подняли меню строительства под новую высоту панели
         var menu_w = 700;
-        var menu_h = 240; // Увеличили высоту меню
+        var menu_h = 260; 
         
-        // Параметры клеточек (должны совпадать с Draw GUI)
         var cell_w = 210;
-        var cell_h = 200; // Увеличили высоту клеточки
-        var cell_y = menu_y + 20;
-        var start_x = menu_x + 20;
-        var gap = 15;
+        var cell_h = 210; 
+        var cell_y = menu_y + 25;
+        var cell_start_x = menu_x + 20;
         
         if (my < menu_y || my > menu_y + menu_h || mx < menu_x || mx > menu_x + menu_w) {
             global.build_menu_open = false; 
         } else {
             if (my > cell_y && my < cell_y + cell_h) {
                 if (global.build_category == "house") {
-                    if (mx > start_x + cell_w + gap && mx < start_x + cell_w*2 + gap) { build_mode = "house"; global.build_menu_open = false; }
+                    if (mx > cell_start_x && mx < cell_start_x + cell_w) { build_mode = "house"; global.build_menu_open = false; }
+                    else if (mx > cell_start_x + cell_w + gap && mx < cell_start_x + cell_w*2 + gap) { build_mode = "medium_house"; global.build_menu_open = false; }
+                    else if (mx > cell_start_x + (cell_w + gap)*2 && mx < cell_start_x + cell_w*3 + gap*2) { build_mode = "lux_house"; global.build_menu_open = false; }
                 } else if (global.build_category == "stations") {
-                    if (mx > start_x && mx < start_x + cell_w) { build_mode = "tec"; global.build_menu_open = false; }
-                    else if (mx > start_x + cell_w + gap && mx < start_x + cell_w*2 + gap) { build_mode = "solar"; global.build_menu_open = false; }
-                    else if (mx > start_x + (cell_w + gap)*2 && mx < start_x + cell_w*3 + gap*2) { build_mode = "wind"; global.build_menu_open = false; }
+                    if (mx > cell_start_x && mx < cell_start_x + cell_w) { build_mode = "tec"; global.build_menu_open = false; }
+                    else if (mx > cell_start_x + cell_w + gap && mx < cell_start_x + cell_w*2 + gap) { build_mode = "solar"; global.build_menu_open = false; }
+                    else if (mx > cell_start_x + (cell_w + gap)*2 && mx < cell_start_x + cell_w*3 + gap*2) { build_mode = "wind"; global.build_menu_open = false; }
                 }
             }
         }
         exit;
     }
 
-    // 3. КЛИК ПО МИРУ (ПОСТРОЙКА)
     if (!global.build_menu_open && my < ui_y) {
         if (instance_exists(obj_ghost)) {
             if (obj_ghost.can_build) {
@@ -93,7 +100,9 @@ if (mouse_check_button_pressed(mb_left)) {
         } else {
             var g = instance_create_depth(0, 0, 10, obj_ghost);
             switch (build_mode) {
-                case "house": g.sprite_index = spr_house_1; g.spawn_obj = obj_house; g.cost = 50; break;
+                case "house": g.sprite_index = spr_good_house_1; g.spawn_obj = obj_house; g.cost = 50; break;
+                case "medium_house": g.sprite_index = spr_medium_house_1; g.spawn_obj = obj_medium_house; g.cost = 150; break;
+                case "lux_house": g.sprite_index = spr_Lux_house_1; g.spawn_obj = obj_lux_house; g.cost = 400; break;
                 case "tec":   g.sprite_index = spr_tec;   g.spawn_obj = obj_tec;   g.cost = 150; break;
                 case "solar": g.sprite_index = spr_solar; g.spawn_obj = obj_solar; g.cost = 200; break;
                 case "wind":  g.sprite_index = spr_wind;  g.spawn_obj = obj_wind;  g.cost = 250; break;
@@ -131,14 +140,14 @@ with (obj_solar) {
     else if (global.weather == "cloudy") global.total_energy += energy_gen / 2;
     else global.total_energy += energy_gen;
 }
-with (obj_house) { 
-    if (global.upg_insulation) global.used_energy += 5; 
-    else global.used_energy += 10; 
+with (obj_residential) { 
+    if (global.upg_insulation) global.used_energy += (energy_use / 2); 
+    else global.used_energy += energy_use; 
 }
 
 // === 5. ЭКОНОМИКА И ЭКОЛОГИЯ ===
 if (global.total_energy >= global.used_energy) {
-    with (obj_house) { global.money += 0.15; } 
+    with (obj_residential) { global.money += money_gain; } 
 }
 if (global.total_pollution > 0) {
     global.eco_score -= (global.total_pollution / 4000); 
@@ -165,10 +174,14 @@ camera_set_view_pos(cam, cam_x, cam_y);
 
 // === 7. СОВЕТЫ ===
 global.tip_timer += 1;
-if (global.tip_timer >= 900) {
+if (global.tip_timer >= 600) { 
     global.tip_timer = 0;
-    var random_index = irandom(array_length(global.tips) - 1);
-    global.current_tip = global.tips[random_index];
-    global.tip_display_timer = 360; 
+    var new_tip = global.current_tip;
+    while (new_tip == global.current_tip) {
+        var random_index = irandom(array_length(global.tips) - 1);
+        new_tip = global.tips[random_index];
+    }
+    global.current_tip = new_tip;
+    global.tip_display_timer = 480; 
 }
 if (global.tip_display_timer > 0) global.tip_display_timer -= 1;
