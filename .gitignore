@@ -23,3 +23,15 @@ datafiles_yy/
 *.dll
 *.zip
 .gamemaker/
+
+# VS code
+.vscode
+.vscode/
+
+# Serena
+.serena
+.serena/
+
+# Intellij IDEA
+.idea
+.idea/
